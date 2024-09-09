@@ -1,0 +1,6 @@
+.vscode/
+.mbs/
+.lua_history
+.shell_history
+mbs.lua
+startup/00_mbs.lua
