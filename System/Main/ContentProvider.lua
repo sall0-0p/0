@@ -1,5 +1,6 @@
 local Map = require(".System.Main.Classes.Utils.Map.Map");
 local Yaml = require(".System.Main.Libraries.yaml");
+local Logger = require(".System.Main.Services.Logger.Logger");
 
 local ContentProvider = {};
 ContentProvider.__content = {};
@@ -19,12 +20,15 @@ local function registerClass(configPath, packagePath)
             loaded = false;
             pathToInstance = "." .. string.gsub(parentFolder, "/", ".") .. "." .. config.main;
             metadata = config;
+            Logger.info("Registered Class `%s` in LAZY mode;", packagePath)
         });
     else
         ContentProvider.__content.classes:put(packagePath, {
             loaded = true;
             instance = require("." .. string.gsub(parentFolder, "/", ".") .. "." .. config.main);
             metadata = config;
+
+            Logger.info("Registered Class `%s` in EAGER mode;", packagePath)
         });
     end
 end
@@ -40,12 +44,16 @@ local function registerService(configPath, packagePath)
             loaded = false;
             pathToInstance = "." .. string.gsub(parentFolder, "/", ".") .. "." .. config.main;
             metadata = config;
+
+            Logger.info("Registered Service `%s` in LAZY mode;", packagePath)
         });
     else
         ContentProvider.__content.services:put(packagePath, {
             loaded = true;
             instance = require("." .. string.gsub(parentFolder, "/", ".") .. "." .. config.main);
             metadata = config;
+
+            Logger.info("Registered Service `%s` in EAGER mode;", packagePath)
         });
     end
 end

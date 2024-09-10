@@ -2,8 +2,6 @@ local System = {};
 
 -- ContentProvider
 local ContentProvider = require ".System.Main.ContentProvider";
-ContentProvider.registerRecursive("/System/Main/Classes");
-ContentProvider.registerRecursive("/System/Main/Services");
 
 System.__contentProvider = ContentProvider;
 

@@ -1,4 +1,4 @@
-main: "ProcessManager" # file to be requested
+main: "Logger" # file to be requested
 version: 1.0
 author: _lordBucket
 lazy_loading: false # wether this class should be loaded on startup or when first used

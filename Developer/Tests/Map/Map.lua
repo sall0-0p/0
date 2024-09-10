@@ -1,4 +1,5 @@
-local Map = require(".System.Main.Classes.Utils.Map.Map");
+local ContentProvider = System.getContentProvider();
+local Map = ContentProvider.getClass("Utils.Map");
 
 local tests = {};
 
