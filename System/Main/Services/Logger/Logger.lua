@@ -61,7 +61,6 @@ function Logger.fatal(message, ...)
     log("FATAL", message, ...);
 end
 
-
 function Logger.error(message, ...)
     log("ERROR", message, ...);
 end
