@@ -2,6 +2,20 @@
 -- TODO: Implement keys() method
 -- TODO: Add more assert methods
 
+local function formatValue(tbl, v)
+    if type(v) == "function" then
+        return "function()"
+    else 
+        return v;
+    end
+end
+
+local function debugPrint(tbl)
+    for k, v in pairs(tbl) do
+        print(string.format("%s - %s"), k, formatValue(tbl, v));
+    end
+end
+
 --- @class Map
 --- @field className string
 local Map = {};
@@ -10,11 +24,36 @@ Map.__index = Map;
 --- Blank constructor for a `Map` Class. Outputs empty `Map`.
 --- @return Map returns
 function Map.new()
+    local proxy = {};
     local map = setmetatable({}, Map);
     map.__content = {};
     map.className = "Map";
 
-    return map;
+    setmetatable(proxy, {
+        __index = function(obj, key) 
+            if rawget(map, key) then
+                return rawget(map, key);
+            elseif rawget(Map, key) then
+                return rawget(Map, key)
+            else
+                return rawget(rawget(map, "__content"), key);
+            end
+        end,
+
+        __newindex = function(obj, key, value)
+            if rawget(map, key) then
+               rawset(map, key, value)
+            else 
+                rawset(rawget(map, "__content"), key, value)
+            end
+        end,
+
+        __call = function() 
+            return next, map.__content, nil;
+        end
+    })
+
+    return proxy;
 end
 
 --- Constructor for a `Map` Class. Takes table (as disctionary).
@@ -230,6 +269,26 @@ end
 --- @return table returns
 function Map:toTable()
     return self.__content;
+end
+
+function Map:getKeys()
+    local result = {};
+
+    for k, _ in pairs(self.__content) do
+        table.insert(result);
+    end
+
+    return result;
+end
+
+function Map:getValues()
+    local result = {};
+
+    for _, v in pairs(self.__content) do
+        table.insert(result);
+    end
+
+    return result;
 end
 
 -- Meta

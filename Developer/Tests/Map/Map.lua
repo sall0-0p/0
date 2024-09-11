@@ -146,6 +146,36 @@ function tests.size()
     return map:size() == 2;
 end
 
+function tests.advancedGet()
+    local map = Map();
+    map:put("age1", 10);
+
+    return map.age1 == 10;
+end
+
+function tests.advancedSet()
+    local map = Map();
+    map.age1 = 10;
+
+    return map:get("age1") == 10;
+end
+
+function tests.iterator()
+    local map = Map();
+    local count = 0;
+
+    map.key1 = "value1";
+    map.key2 = "value2";
+    map.key3 = "value3";
+    map.key4 = "value4";
+
+    for _, _ in map() do
+        count = count + 1;
+    end
+
+    return count == 4;
+end
+
 return {
     tests = tests;
     titles = {
@@ -163,5 +193,8 @@ return {
         replace = "replace() method;",
         replaceAll = "replaceAll() method;",
         size = "size() method;",
+        advancedGet = "map.key GET interaction;",
+        advancedSet = "map.key = value SET interaction;",
+        iterator = "iteration without pairs",
     }
 }
