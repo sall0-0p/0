@@ -46,7 +46,7 @@ local function log(type, message, ...)
     local timestamp = os.date("%T");
     local debugInfo = debug.getinfo(3);
     ---@diagnostic disable-next-line: undefined-field
-    local prefix = string.format("[%s] %s ", timestamp, string.format("%s[%d]", debugInfo.short_src, debugInfo.currentline));
+    local prefix = string.format("[%s] %s ", timestamp, string.format("%s:%d", debugInfo.short_src, debugInfo.currentline));
     local content = string.format("[%s] " .. message, type,  ...);
 
     for i = #prefix, MESSAGE_INDENT do

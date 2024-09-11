@@ -48,8 +48,8 @@ function Map.new()
             end
         end,
 
-        __call = function() 
-            return next, map.__content, nil;
+        __call = function(_, _, key) 
+            return next(map.__content, key);
         end
     })
 

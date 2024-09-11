@@ -8,3 +8,4 @@ startup/00_mbs.lua
 
 coroutineTests.lua
 oopTests.lua
+parallel.lua

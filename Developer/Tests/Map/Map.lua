@@ -169,7 +169,7 @@ function tests.iterator()
     map.key3 = "value3";
     map.key4 = "value4";
 
-    for _, _ in map() do
+    for k, v in map do
         count = count + 1;
     end
 
