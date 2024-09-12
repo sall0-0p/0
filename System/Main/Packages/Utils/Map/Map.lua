@@ -23,7 +23,11 @@ Map.__index = Map;
 
 --- Blank constructor for a `Map` Class. Outputs empty `Map`.
 --- @return Map returns
-function Map.new()
+function Map.new(input)
+    if type(input) == "table" then
+        return Map.__fromTable(input);
+    end
+
     local proxy = {};
     local map = setmetatable({}, Map);
     map.__content = {};
@@ -59,26 +63,27 @@ end
 --- Constructor for a `Map` Class. Takes table (as disctionary).
 --- @param input table
 --- @return Map returns
-function Map.fromTable(input)
+function Map.__fromTable(input)
     local map = Map();
     map.__content = input;
 
     return map;
 end
 
+--- Removes all mappings present in the Map.
 function Map:clear()
     self.__content = {};
 end
 
 --- Attempts to compute a mapping for the specified key and its current mapped value (or nil if there is no current mapping).
 --- @param key any
---- @param remappingFunction function accepts arguments `key, value`, returns new value
+--- @param mappingFunction function accepts arguments `key, value`, returns new value
 --- @return any value that was mapped to the key as result of `mappingFunction(key, value)` 
-function Map:compute(key, remappingFunction)
+function Map:compute(key, mappingFunction)
     assert(key ~= nil, "Key cannot be nil!");
-    assert(remappingFunction ~= nil, "Remapping function cannot be nil!");
+    assert(mappingFunction ~= nil, "Remapping function cannot be nil!");
 
-    local value = remappingFunction(key, self.__content[key]);
+    local value = mappingFunction(key, self.__content[key]);
     self.__content[key] = value;
 
     return value;
@@ -86,15 +91,15 @@ end
 
 --- If the specified key is not already associated with a value (or is mapped to nil), attempts to compute its value using the given mapping function and enters it into this map unless nil.
 --- @param key any
---- @param remappingFunction function accepts arguments `key`, returns new value
+--- @param mappingFunction function accepts arguments `key`, returns new value
 --- @return any value that was mapped to the key as result of `mappingFunction(key)` 
-function Map:computeIfAbsent(key, remappingFunction)
+function Map:computeIfAbsent(key, mappingFunction)
     assert(key ~= nil, "Key cannot be nil!");
-    assert(remappingFunction ~= nil, "Remapping function cannot be nil!");
+    assert(mappingFunction ~= nil, "Remapping function cannot be nil!");
 
     local value;
     if self.__content[key] == nil then
-        value = remappingFunction(key);
+        value = mappingFunction(key);
         self.__content[key] = value;
     end
     
@@ -103,15 +108,15 @@ end
 
 --- If the value for the specified key is present and non-nil, attempts to compute a new mapping given the key and its current mapped value.
 --- @param key any
---- @param remappingFunction function accepts arguments `key, value`, returns new value
+--- @param mappingFunction function accepts arguments `key, value`, returns new value
 --- @return any value that was mapped to the key as result of `mappingFunction(key, value)` 
-function Map:computeIfPresent(key, remappingFunction)
+function Map:computeIfPresent(key, mappingFunction)
     assert(key ~= nil, "Key cannot be nil!");
-    assert(remappingFunction ~= nil, "Remapping function cannot be nil!");
+    assert(mappingFunction ~= nil, "Remapping function cannot be nil!");
 
     local value;
     if self.__content[key] ~= nil then
-        value = remappingFunction(key, self.__content[key]);
+        value = mappingFunction(key, self.__content[key]);
         self.__content[key] = value;
     end
     
@@ -182,8 +187,12 @@ end
 --- Associates the specified value with the specified key in this map.
 --- @param key any
 --- @param value any
+--- @return any
 function Map:put(key, value)
+    local old = self.__content[key];
     self.__content[key] = value;
+
+    return old;
 end
 
 --- Copies all of the mappings from the specified map to this map.
@@ -198,18 +207,23 @@ end
 --- @param key any
 --- @param value any
 function Map:putIfAbsent(key, value)
-    if self.__content[key] == nil then
+    if not self.__content[key] then
         self.__content[key] = value;
-        return value;
+        return nil;
     end
 
-    return nil;
+    return self.__content[key];
 end 
 
 --- Removes the mapping for a key from this map if it is present, if so - returns previous held value.
 --- @param key any
+--- @param value? any
 --- @return any
-function Map:remove(key)
+function Map:remove(key, value)
+    if value then
+        return self:__removeSpecificValue(key, value);
+    end
+
     if self.__content[key] ~= nil then
         local value = self.__content[key];
         self.__content[key] = nil;
@@ -223,7 +237,7 @@ end
 --- @param key any
 --- @param value any
 --- @return boolean
-function Map:removeSpecificValue(key, value)
+function Map:__removeSpecificValue(key, value)
     if self.__content[key] == value then
         
         self.__content[key] = nil;
@@ -233,7 +247,7 @@ function Map:removeSpecificValue(key, value)
     return false;
 end
 
---- Replaces the entry for the specified key only if currently mapped to the specified value. Returns boolean indicating wether value was removed or not.
+--- Replaces entry only if it is already mapped to specific value.
 --- @param key any
 --- @param value any
 --- @return boolean

@@ -1,6 +1,6 @@
-local Map = require(".System.Main.Classes.Utils.Map.Map");
-local Yaml = require(".System.Main.Libraries.yaml");
-local Logger = require(".System.Main.Services.Logger.Logger");
+local Map = require(".System.Main.Packages.Utils.Map.Map");
+local Yaml = require(".System.Main.Packages.Utils.Libraries.yaml");
+local Logger = require(".System.Main.Packages.Utils.Logger.Logger");
 
 local ContentProvider = {};
 ContentProvider.__content = {};
@@ -58,7 +58,7 @@ local function registerService(configPath, packagePath)
     end
 end
 
-local function register(configPath, packagePath)
+function ContentProvider.register(configPath, packagePath)
     if fs.getName(configPath) == "class.yml" then
         registerClass(configPath, packagePath);
     end
@@ -77,7 +77,7 @@ function ContentProvider.registerRecursive(path, packagePath)
         for _, item in pairs(fs.list(path)) do
             local itemPath = fs.combine(path, item);
             if string.find(item, ".yml") then
-                register(itemPath, packagePath);
+                ContentProvider.register(itemPath, packagePath);
             end
 
             if fs.isDir(itemPath) then
