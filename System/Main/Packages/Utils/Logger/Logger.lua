@@ -42,12 +42,13 @@ local function clearLogs(logFolder)
 end
 
 local function log(type, message, ...)
+    
     local logFile = fs.open(latestPath, "a");
     local timestamp = os.date("%T");
     local debugInfo = debug.getinfo(3);
     ---@diagnostic disable-next-line: undefined-field
     local prefix = string.format("[%s] %s ", timestamp, string.format("%s:%d", debugInfo.short_src, debugInfo.currentline));
-    local content = string.format("[%s] " .. message, type,  ...);
+    local content = string.format("[%s] " .. (message or "nil"), type,  ...);
 
     for i = #prefix, MESSAGE_INDENT do
         prefix = prefix .. " ";

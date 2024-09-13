@@ -1,70 +1,42 @@
 local Map = require(".System.Main.Packages.Utils.Map.Map");
-local Yaml = require(".System.Main.Packages.Utils.Libraries.yaml");
+local Yaml = require(".System.Main.Packages.Utils.Modules.yaml");
 local Logger = require(".System.Main.Packages.Utils.Logger.Logger");
 
 local ContentProvider = {};
-ContentProvider.__content = {};
-ContentProvider.__content.classes = Map();
-ContentProvider.__content.services = Map();
+ContentProvider.__content = Map();
 
--- Functions
-
-local function registerClass(configPath, packagePath)
-    local parentFolder = fs.getDir(configPath);
-    local file = fs.open(configPath, "r");
-    local config = Yaml.eval(file.readAll());
-    file.close();
-
-    if config.lazy_loading then
-        ContentProvider.__content.classes:put(packagePath, {
-            loaded = false;
-            pathToInstance = "." .. string.gsub(parentFolder, "/", ".") .. "." .. config.main;
-            metadata = config;
-            Logger.info("Registered Class `%s` in LAZY mode;", packagePath)
-        });
-    else
-        ContentProvider.__content.classes:put(packagePath, {
-            loaded = true;
-            instance = require("." .. string.gsub(parentFolder, "/", ".") .. "." .. config.main);
-            metadata = config;
-
-            Logger.info("Registered Class `%s` in EAGER mode;", packagePath)
-        });
-    end
-end
-
-local function registerService(configPath, packagePath)
-    local parentFolder = fs.getDir(configPath);
-    local file = fs.open(configPath, "r");
-    local config = Yaml.eval(file.readAll());
-    file.close();
-
-    if config.lazy_loading then
-        ContentProvider.__content.services:put(packagePath, {
-            loaded = false;
-            pathToInstance = "." .. string.gsub(parentFolder, "/", ".") .. "." .. config.main;
-            metadata = config;
-
-            Logger.info("Registered Service `%s` in LAZY mode;", packagePath)
-        });
-    else
-        ContentProvider.__content.services:put(packagePath, {
-            loaded = true;
-            instance = require("." .. string.gsub(parentFolder, "/", ".") .. "." .. config.main);
-            metadata = config;
-
-            Logger.info("Registered Service `%s` in EAGER mode;", packagePath)
-        });
-    end
-end
+local types = Map.__fromTable({
+    class = "class.yml",
+    service = "service.yml",
+})
 
 function ContentProvider.register(configPath, packagePath)
-    if fs.getName(configPath) == "class.yml" then
-        registerClass(configPath, packagePath);
+    if not types:containsValue(fs.getName(configPath)) then
+        Logger.warn("Tried to register %s, which is not suitable!", fs.getName(configPath));
+        return
     end
 
-    if fs.getName(configPath) == "service.yml" then
-        registerService(configPath, packagePath);
+    local parentFolder = fs.getDir(configPath);
+    local file = fs.open(configPath, "r");
+    local config = Yaml.eval(file.readAll());
+    file.close();
+
+    if config.lazy_loading then
+        ContentProvider.__content:put(packagePath, {
+            loaded = false;
+            pathToInstance = "." .. string.gsub(parentFolder, "/", ".") .. "." .. config.main;
+            metadata = config;
+
+            Logger.info("Registered package `%s` in LAZY mode;", packagePath)
+        });
+    else
+        ContentProvider.__content:put(packagePath, {
+            loaded = true;
+            instance = require("." .. string.gsub(parentFolder, "/", ".") .. "." .. config.main);
+            metadata = config;
+
+            Logger.info("Registered package `%s` in EAGER mode;", packagePath)
+        });
     end
 end
 
@@ -72,7 +44,6 @@ end
 ---@param path string
 function ContentProvider.registerRecursive(path, packagePath)
     packagePath = packagePath or "";
-    print(packagePath);
     if fs.exists(path) then
         for _, item in pairs(fs.list(path)) do
             local itemPath = fs.combine(path, item);
@@ -91,38 +62,21 @@ function ContentProvider.registerRecursive(path, packagePath)
     end
 end
 
----Get class by name, function is for system use. System classes are stored in `System/Main/Classes`
----@param className string
----@return table class
-function ContentProvider.getClass(className)
-    local class = ContentProvider.__content.classes:get(className);
-    assert(class, string.format("Class with name %s does not exist!", className));
+function ContentProvider.get(packageName)
+    local package = ContentProvider.__content:get(packageName);
+    assert(package, string.format("Package with name %s is not found", packageName));
 
-    if class.loaded == true then
-        return class.instance;
+    if package.loaded == true then
+        return package.instance;
     else 
-        class.instance = require(class.pathToInstance);
-        class.pathToInstance = nil;
-        class.loaded = true;
-        ContentProvider.__content.classes:replace(className, class);
-        return class.instance;
+        package.instance = require(package.pathToInstance);
+        package.pathToInstance = nil;
+        package.loaded = true;
+        ContentProvider.__content:replace(packageName, package);
+        return package.instance;
     end
 end
 
 
-function ContentProvider.getService(serviceName)
-    local service = ContentProvider.__content.services:get(serviceName);
-    assert(service, string.format("Service with name %s does not exist!", serviceName));
-
-    if service.loaded == true then
-        return service.instance;
-    else 
-        service.instance = require(service.pathToInstance);
-        service.pathToInstance = nil;
-        service.loaded = true;
-        ContentProvider.__content.services:replace(serviceName, service);
-        return service.instance;
-    end
-end
 
 return ContentProvider;

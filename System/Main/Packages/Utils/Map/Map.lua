@@ -2,20 +2,6 @@
 -- TODO: Implement keys() method
 -- TODO: Add more assert methods
 
-local function formatValue(tbl, v)
-    if type(v) == "function" then
-        return "function()"
-    else 
-        return v;
-    end
-end
-
-local function debugPrint(tbl)
-    for k, v in pairs(tbl) do
-        print(string.format("%s - %s"), k, formatValue(tbl, v));
-    end
-end
-
 --- @class Map
 --- @field className string
 local Map = {};

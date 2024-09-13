@@ -6,7 +6,7 @@ local function generateProxy(parent)
             elseif rawget(parent, key) == nil then
                 return nil;
             else 
-                local getter = "get" .. string.upper(string.sub(key, 1, 1)) .. string.lower(string.sub(key, 2, -1))
+                local getter = "get" .. string.upper(string.sub(key, 1, 1)) .. string.sub(key, 2, -1);
                 if type(parent[getter]) == "function" then
                     return parent[getter](parent);
                 else 
@@ -16,7 +16,7 @@ local function generateProxy(parent)
         end,
 
         __newindex = function(obj, key, value) 
-            local setter = "set" .. string.upper(string.sub(key, 1, 1)) .. string.lower(string.sub(key, 2, -1))
+            local setter = "set" .. string.upper(string.sub(key, 1, 1)) .. string.sub(key, 2, -1);
             if type(parent[setter]) == "function" then
                 parent[setter](parent, value);
             end

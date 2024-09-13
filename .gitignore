@@ -6,6 +6,7 @@ mbs.lua
 startup/00_mbs.lua
 .var/
 
-coroutineTests.lua
-oopTests.lua
+Developer/Tests/
+before_events.lua
 parallel.lua
+shell.lua

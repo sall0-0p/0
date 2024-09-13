@@ -4,6 +4,7 @@ local System = {};
 local ContentProvider = require ".System.Main.ContentProvider";
 
 System.__contentProvider = ContentProvider;
+System.DEBUG = true;
 
 -- Methods
 function System.getContentProvider()
