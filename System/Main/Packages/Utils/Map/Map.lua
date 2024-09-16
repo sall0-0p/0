@@ -20,7 +20,7 @@ function Map.new(input)
     map.className = "Map";
 
     setmetatable(proxy, {
-        __index = function(obj, key) 
+        __index = function(_, key) 
             if rawget(map, key) then
                 return rawget(map, key);
             elseif rawget(Map, key) then
@@ -30,7 +30,7 @@ function Map.new(input)
             end
         end,
 
-        __newindex = function(obj, key, value)
+        __newindex = function(_, key, value)
             if rawget(map, key) then
                rawset(map, key, value)
             else 

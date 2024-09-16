@@ -10,7 +10,7 @@ local function generateProxy(parent)
                 if type(parent[getter]) == "function" then
                     return parent[getter](parent);
                 else 
-                    return nil;
+                    error("Attempt to access non-existent property or getter: " .. key)
                 end
             end
         end,
@@ -19,6 +19,8 @@ local function generateProxy(parent)
             local setter = "set" .. string.upper(string.sub(key, 1, 1)) .. string.sub(key, 2, -1);
             if type(parent[setter]) == "function" then
                 parent[setter](parent, value);
+            else 
+                error("Attempt to set non-existent property or setter: " .. key)
             end
         end,
     }

@@ -26,6 +26,12 @@ local Event = ContentProvider.get("Events.Event");
 --     return Environment.__pid;
 -- end
 
+local function printTableKeys(tbl)
+    for key, _ in pairs(tbl) do
+        print("Key: " .. tostring(key))
+    end
+end
+
 return function(process)
     local Environment = {};
 
@@ -34,7 +40,7 @@ return function(process)
     Environment.keys = {}
 
     Environment.os.sleep = function(time) 
-        process:sleep(time);
+        process.currentThread:sleep(time);
         os.pullEvent("timer");
     end
 
