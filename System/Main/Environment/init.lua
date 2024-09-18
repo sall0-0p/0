@@ -3,35 +3,6 @@ local Logger = ContentProvider.get("Utils.Logger");
 local EventManager = ContentProvider.get("EventManager");
 local Event = ContentProvider.get("Events.Event");
 
--- Environment.colors = colors;
--- Environment.colours = colours;
--- Environment.commands = commands;
--- Environment.disk = disk;
--- Environment.fs = fs;
--- Environment.gps = gps;
--- Environment.help = help;
--- Environment.http = http;
--- Environment.paintutils = paintutils;
--- Environment.peripheral = peripheral;
--- Environment.pocket = pocket;
--- Environment.rednet = rednet;
--- Environment.redstone = redstone;
--- Environment.settings = settings;
--- Environment.term = term;
--- Environment.textutils = textutils;
--- Environment.vector = vector;
--- Environment.os = os;
-
--- function Environment.getPID()
---     return Environment.__pid;
--- end
-
-local function printTableKeys(tbl)
-    for key, _ in pairs(tbl) do
-        print("Key: " .. tostring(key))
-    end
-end
-
 return function(process)
     local Environment = {};
 
@@ -42,6 +13,7 @@ return function(process)
     Environment.os.sleep = function(time) 
         process.currentThread:sleep(time);
         os.pullEvent("timer");
+        process.currentThread.timer = nil;
     end
 
     Environment.print = function(...)
@@ -76,6 +48,7 @@ return function(process)
 
     Environment.__pid = process.PID;
     Environment.__name = process.name;
+    Environment.__process = process;
 
     return Environment;
 end;

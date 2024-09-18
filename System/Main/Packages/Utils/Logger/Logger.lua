@@ -1,4 +1,4 @@
-local DEFAULT_LOGS_LOCATION = "/.var/logs";
+local DEFAULT_LOGS_LOCATION = "/System/Logs";
 local MESSAGE_INDENT = 55;
 local MAX_LOGS = 5;
 
@@ -56,6 +56,14 @@ local function log(type, message, ...)
 
     logFile.writeLine(prefix .. "| " .. content);
     logFile.close();
+end
+
+function Logger.traceback(thread)
+    local trace = debug.traceback(thread)
+    
+    for line in trace:gmatch("[^\r\n]+") do
+        log("FATAL", line);
+    end
 end
 
 function Logger.fatal(message, ...)

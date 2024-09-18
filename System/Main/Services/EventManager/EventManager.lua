@@ -8,6 +8,8 @@ local EventManager = {};
 
 local ProcessManager;
 local listeners = Map();
+local listening = false;
+local eventQueue = {};
 
 function EventManager.init(processManager)
     ProcessManager = processManager;
@@ -45,7 +47,39 @@ local function fireListeners(Event, destinationPid)
     end
 end
 
+local function processEvent(eventData)
+    if eventData[1] ~= "custom" and eventData[1] ~= "timer" then
+        EventManager.broadcastToAll(0, Event(eventData[1], table.pack(table.unpack(eventData, 2, #eventData))));
+        listening = false;
+        return eventData;
+    elseif eventData[1] == "timer" then
+        for _, process in ipairs(ProcessManager.getProcessList()) do
+            for threadIndex, thread in ipairs(process.threads) do
+                if thread.timer == eventData[2] then
+                    EventManager.sendToProcess(0, Event(eventData[1], table.pack(table.unpack(eventData, 2, #eventData))), process.PID);
+                end
+            end
+        end
+        listening = false;
+        return eventData;
+    else 
+        return EventManager.waitForEvents();
+    end
+end
+
+function EventManager.getListeners()
+    return listeners;
+end
+
 function EventManager.registerListener(senderPid, EventType, listener)
+    if EventType == Enum.Signal.SIGKILL then
+        error("You are not allowed to register listener for SIGKILL");
+    end
+
+    if EventType == Enum.Signal.SIGSTOP then
+        error("You are not allowed to register listener for SIGSTOP");
+    end
+
     local index = #listeners + 1
     secureProcessPath(EventType, senderPid)
 
@@ -65,6 +99,10 @@ function EventManager.sendToProcess(senderPID, Event, destinationPid)
         table.insert(destinationProcess.eventQueue, Event);
     end
 
+    if not listening then
+        table.insert(eventQueue, Event);
+    end
+
     fireListeners(Event, destinationPid);
 end
 
@@ -80,20 +118,23 @@ function EventManager.broadcastToAll(senderPID, Event)
         table.insert(process.eventQueue, Event);
     end
 
+    if not listening then
+        table.insert(eventQueue, Event);
+    end
+
     fireListeners(Event, "*");
 end
 
 function EventManager.waitForEvents()
+    for index, event in ipairs(eventQueue) do
+        eventQueue[index] = nil;
+        return table.pack(event.eventType, table.unpack(event.body));
+    end
+
+    listening = true;
     local eventData = table.pack(os.pullEventRaw());
 
-    if eventData[1] ~= "custom" and eventData[1] ~= "timer" then
-        EventManager.broadcastToAll(0, Event(eventData[1], table.pack(table.unpack(eventData, 2, #eventData))));
-        return eventData;
-    elseif eventData[1] == "timer" then
-        return eventData;
-    else 
-        return EventManager.waitForEvents();
-    end
+    return processEvent(eventData);
 end
 
 return EventManager;

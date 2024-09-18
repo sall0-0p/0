@@ -4,7 +4,8 @@
 .shell_history
 mbs.lua
 startup/00_mbs.lua
-.var/
+System/Logs/
+System/Config/
 
 Developer/Tests/
 before_events.lua

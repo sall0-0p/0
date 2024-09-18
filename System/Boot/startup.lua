@@ -5,4 +5,4 @@ local ContentProvider = System.getContentProvider();
 ContentProvider.registerRecursive("/System/Main/Packages");
 ContentProvider.registerRecursive("/System/Main/Services");
 
-local Logger = ContentProvider.get("Utils.Logger");
+shell.setPath(shell.path() .. ":/bin");

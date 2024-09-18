@@ -10,7 +10,7 @@ function Thread.new(process, func)
 
     thread.parent = process;
     thread.coroutine = coroutine.create(func);
-    thread.timer = 0;
+    thread.timer = nil;
     thread.filter = nil;
 
     --FIXME: Replace with full proxy with full set of getters and setters.

@@ -1,4 +1,4 @@
-local TESTS_FOLDER = "/Developer/UnitTests";
+local TESTS_FOLDER = "/Developer/Tests";
 local successCount = 0;
 local totalCount = 0;
 local hideSuccess = arg[1] == "-s"

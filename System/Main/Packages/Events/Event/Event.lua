@@ -10,7 +10,7 @@ Event.__index = Event;
 function Event.new(eventType, body)
     local event = setmetatable({}, Event);
     event.eventType = eventType;
-    event.body = body;
+    event.body = body or {};
 
     return proxygen(event);
 end
