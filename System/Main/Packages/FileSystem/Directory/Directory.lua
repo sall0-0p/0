@@ -2,6 +2,9 @@ local ContentProvider = System.getContentProvider();
 local FsNode = ContentProvider.get("FileSystem.FsNode");
 
 ---@class Directory
+---@field __children table
+---@field className string
+---@field class table
 local Directory = {};
 Directory.__index = Directory;
 

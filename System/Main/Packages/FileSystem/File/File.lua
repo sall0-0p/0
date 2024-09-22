@@ -2,6 +2,8 @@ local ContentProvider = System.getContentProvider();
 local FsNode = ContentProvider.get("FileSystem.FsNode");
 
 ---@class File
+---@field className string
+---@field class table
 local File = {};
 File.__index = File;
 
