@@ -1,4 +1,4 @@
 local ContentProvider = System.getContentProvider();
-local User = ContentProvider.get("UserManager.User");
+local UserManager = ContentProvider.get("UserManager");
 
-User.new(arg[1], arg[2]);
+UserManager.createUser(arg[1], arg[2]);

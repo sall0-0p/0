@@ -7,7 +7,7 @@ startup/00_mbs.lua
 System/Logs/
 System/Config/
 
-Developer/Tests/
+Developer/ManualTesting/
 before_events.lua
 parallel.lua
 shell.lua

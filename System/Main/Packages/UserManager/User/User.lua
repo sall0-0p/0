@@ -1,7 +1,4 @@
-local proxygen = require(".System.Main.Packages.Utils.Modules.proxygen");
 local hasher = require(".System.Main.Packages.Utils.Modules.sha256");
-
-local USER_CONFIG_FILE = "/System/Config/users.tbl";
 
 --- @class User
 --- @field id number
@@ -12,30 +9,16 @@ local User = {}
 User.__index = User;
 
 -- Utilities
-local function generateId()
-    local configs = fs.list(USER_CONFIG_FOLDER);
 
-    if #configs > 0 then
-        for index, config in pairs(configs) do
-            print(index, config);
-            configs[index] = tonumber(table.pack(string.gsub(config, ".tbl", ""))[1]);
-        end
-    else 
-        return 1;
-    end
-
-    return math.max(table.unpack(configs)) + 1;
-end
-
-function User.new(username, password)
+function User.new(id, username, password)
     local user = setmetatable({}, User);
     
-    user.id = generateId();
+    user.id = id;
     user.username = username;
-    user.salt = hasher.generate_salt(8);
+    user.salt = hasher.generate_salt(16);
     user.hashedPassword = hasher.generate_hash(user.salt .. password);
 
-    return proxygen(user);
+    return user;
 end
 
 function User.fromData(data);
@@ -46,10 +29,30 @@ function User.fromData(data);
     user.salt = data.salt;
     user.hashedPassword = data.hashedPassword;
 
-    return proxygen(user);
+    return user;
+end
+
+function User:toTable()
+    return {
+        id = self.id;
+        username = self.username;
+        salt = self.salt;
+        hashedPassword = self.hashedPassword;
+    }
+end
+
+function User:validatePassword(attemptedPassword)
+    local attemptedHash = hasher.generate_hash(self.salt .. attemptedPassword);
+
+    return attemptedHash == self.hashedPassword;
+end
+
+function User:changePassword(newPassword)
+    self.hashedPassword = hasher.generate_hash(self.salt .. newPassword);
 end
 
 setmetatable(User, {
+    __index = User;
     __call = function(cls, ...)
         return cls.new(...)
     end
