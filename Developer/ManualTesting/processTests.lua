@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-field, undefined-global
 local ContentProvider = System.getContentProvider();
-local ProcessManager = ContentProvider.get("ProcessManager");
+local ProcessManager = ContentProvider.get("UwU.ProcessManager");
 
 local function listenForKeys()
     while true do

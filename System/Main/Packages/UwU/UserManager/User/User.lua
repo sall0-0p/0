@@ -1,4 +1,4 @@
-local hasher = require(".System.Main.Packages.Utils.Modules.sha256");
+local hasher = require(".System.Main.Packages.UwU.Utils.Modules.sha256");
 
 --- @class User
 --- @field id number

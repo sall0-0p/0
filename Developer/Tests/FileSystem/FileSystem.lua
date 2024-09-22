@@ -1,11 +1,11 @@
-local serializer = require(".System.Main.Packages.Utils.Modules.serializer");
+local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer");
 
 -- Test Suite for FileSystem Package (File and Directory)
 
 local ContentProvider = System:getContentProvider();
 
-local File = ContentProvider.get("FileSystem.File");
-local Directory = ContentProvider.get("FileSystem.Directory");
+local File = ContentProvider.get("UwU.FileSystem.File");
+local Directory = ContentProvider.get("UwU.FileSystem.Directory");
 
 local tests = {};
 

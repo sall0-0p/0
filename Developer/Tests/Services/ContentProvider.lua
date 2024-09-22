@@ -2,7 +2,7 @@ local ContentProvider = System.__contentProvider;
 local tests = {};
 
 function tests.importMap()
-    local Map = ContentProvider.get("Utils.Map");
+    local Map = ContentProvider.get("UwU.Utils.Map");
     local map = Map();
 
     return map.className == "Map"

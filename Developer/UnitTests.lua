@@ -1,4 +1,4 @@
-local argparser = require(".System.Main.Packages.Utils.Modules.argparser");
+local argparser = require(".System.Main.Packages.UwU.Utils.Modules.argparser");
 
 local successCount = 0;
 local totalCount = 0;

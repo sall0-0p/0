@@ -1,5 +1,5 @@
 local ContentProvider = System.getContentProvider();
-local FsNode = ContentProvider.get("FileSystem.FsNode");
+local FsNode = ContentProvider.get("UwU.FileSystem.FsNode");
 
 ---@class File
 ---@field className string

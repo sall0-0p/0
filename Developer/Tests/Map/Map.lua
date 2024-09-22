@@ -1,5 +1,5 @@
 local ContentProvider = System.getContentProvider();
-local Map = ContentProvider.get("Utils.Map");
+local Map = ContentProvider.get("UwU.Utils.Map");
 
 local tests = {};
 

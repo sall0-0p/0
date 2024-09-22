@@ -1,6 +1,6 @@
 local ContentProvider = System.getContentProvider();
-local UserManager = ContentProvider.get("UserManager");
-local User = ContentProvider.get("UserManager.User");
+local UserManager = ContentProvider.get("UwU.UserManager");
+local User = ContentProvider.get("UwU.UserManager.User");
 
 local tests = {}
 

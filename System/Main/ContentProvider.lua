@@ -1,6 +1,6 @@
-local Map = require(".System.Main.Packages.Utils.Map.Map");
-local Yaml = require(".System.Main.Packages.Utils.Modules.yaml");
-local Logger = require(".System.Main.Packages.Utils.Logger.Logger");
+local Map = require(".System.Main.Packages.UwU.Utils.Map.Map");
+local Yaml = require(".System.Main.Packages.UwU.Utils.Modules.yaml");
+local Logger = require(".System.Main.Packages.UwU.Utils.Logger.Logger");
 
 local ContentProvider = {};
 ContentProvider.__content = Map();

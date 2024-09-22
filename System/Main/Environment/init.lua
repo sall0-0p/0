@@ -1,7 +1,7 @@
 local ContentProvider = System.getContentProvider();
-local Logger = ContentProvider.get("Utils.Logger");
-local EventManager = ContentProvider.get("EventManager");
-local Event = ContentProvider.get("Events.Event");
+local Logger = ContentProvider.get("UwU.Utils.Logger");
+local EventManager = ContentProvider.get("UwU.EventManager");
+local Event = ContentProvider.get("UwU.Events.Event");
 
 return function(process)
     local Environment = {};

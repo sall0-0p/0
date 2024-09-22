@@ -1,6 +1,6 @@
 local ContentProvider = System.getContentProvider();
-local Group = ContentProvider.get("UserManager.Group");
-local Map = ContentProvider.get("Utils.Map");
+local Group = ContentProvider.get("UwU.UserManager.Group");
+local Map = ContentProvider.get("UwU.Utils.Map");
 
 local GROUP_CONFIG_FILE = "/System/Config/groups.tbl";
 

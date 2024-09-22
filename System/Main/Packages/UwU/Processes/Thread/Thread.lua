@@ -1,6 +1,6 @@
 local ContentProvider = System.getContentProvider();
 
-local proxygen = require(".System.Main.Packages.Utils.Modules.proxygen");
+local proxygen = require(".System.Main.Packages.UwU.Utils.Modules.proxygen");
 
 local Thread = {};
 Thread.__index = Thread;

@@ -1,8 +1,8 @@
 local ContentProvider = System.getContentProvider();
-local Logger = ContentProvider.get("Utils.Logger");
-local Thread = ContentProvider.get("Processes.Thread");
+local Logger = ContentProvider.get("UwU.Utils.Logger");
+local Thread = ContentProvider.get("UwU.Processes.Thread");
 
-local proxygen = require(".System.Main.Packages.Utils.Modules.proxygen");
+local proxygen = require(".System.Main.Packages.UwU.Utils.Modules.proxygen");
 local envgen = require(".System.Main.Environment");
 local counter = 0;
 

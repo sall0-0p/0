@@ -37,7 +37,6 @@ local function clearLogs(logFolder)
     while #logs > MAX_LOGS - 1 do
         local oldest = table.remove(logs, 1)
         fs.delete(oldest.path)
-        print("Deleted old log:", oldest.path)
     end
 end
 

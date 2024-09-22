@@ -1,8 +1,8 @@
 local ContentProvider = System.getContentProvider();
-local EventManager = ContentProvider.get("EventManager");
-local Process = ContentProvider.get("Processes.Process");
-local Event = ContentProvider.get("Events.Event");
-local Logger = ContentProvider.get("Utils.Logger");
+local EventManager = ContentProvider.get("UwU.EventManager");
+local Process = ContentProvider.get("UwU.Processes.Process");
+local Event = ContentProvider.get("UwU.Events.Event");
+local Logger = ContentProvider.get("UwU.Utils.Logger");
 
 local ProcessManager = {};
 local processes = {};

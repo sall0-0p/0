@@ -1,4 +1,4 @@
-local proxygen = require(".System.Main.Packages.Utils.Modules.proxygen");
+local proxygen = require(".System.Main.Packages.UwU.Utils.Modules.proxygen");
 
 --- @class EventConnection
 --- @field __disconnectFunction function

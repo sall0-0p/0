@@ -1,8 +1,8 @@
 local ContentProvider = System.getContentProvider();
-local Map = ContentProvider.get("Utils.Map");
-local Event = ContentProvider.get("Events.Event");
-local Logger = ContentProvider.get("Utils.Logger");
-local EventConnection = ContentProvider.get("Events.EventConnection");
+local Map = ContentProvider.get("UwU.Utils.Map");
+local Event = ContentProvider.get("UwU.Events.Event");
+local Logger = ContentProvider.get("UwU.Utils.Logger");
+local EventConnection = ContentProvider.get("UwU.Events.EventConnection");
 
 local EventManager = {};
 

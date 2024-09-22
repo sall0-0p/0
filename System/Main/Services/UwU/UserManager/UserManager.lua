@@ -1,8 +1,8 @@
 local ContentProvider = System.getContentProvider();
-local User = ContentProvider.get("UserManager.User");
-local Group = ContentProvider.get("UserManager.Group");
-local GroupManager = ContentProvider.get("GroupManager");
-local Map = ContentProvider.get("Utils.Map");
+local User = ContentProvider.get("UwU.UserManager.User");
+local Group = ContentProvider.get("UwU.UserManager.Group");
+local GroupManager = ContentProvider.get("UwU.GroupManager");
+local Map = ContentProvider.get("UwU.Utils.Map");
 
 local USERS_FOLDER = "/Users/";
 local USER_CONFIG_FILE = "/System/Config/users.tbl";

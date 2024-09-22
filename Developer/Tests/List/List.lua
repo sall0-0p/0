@@ -1,5 +1,5 @@
 local ContentProvider = System.getContentProvider();
-local List = ContentProvider.get("Utils.List");
+local List = ContentProvider.get("UwU.Utils.List");
 
 local tests = {}
 
