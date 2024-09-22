@@ -1,7 +1,12 @@
-local TESTS_FOLDER = "/Developer/Tests";
+local argparser = require(".System.Main.Packages.Utils.Modules.argparser");
+
 local successCount = 0;
 local totalCount = 0;
-local hideSuccess = arg[1] == "-s"
+local args = argparser(arg);
+local hideSuccess = args["-s"] or false;
+local showStackTrace = args["-t"] or false;
+
+local testsFolder = args["-d"] or "/Developer/Tests";
 
 local function turnPathIntoRequire(path)
     local result = string.gsub(path, "%.[a-zA-Z]+$", "");
@@ -11,31 +16,51 @@ local function turnPathIntoRequire(path)
 end
 
 local function runTestsInFolder(path)
-    local contents = fs.list(path);
+    local contents = fs.list(path)
     for _, v in pairs(contents) do
-        if fs.isDir(fs.combine(TESTS_FOLDER, v)) then
-            runTestsInFolder(fs.combine(path, v));
+        if fs.isDir(fs.combine(testsFolder, v)) then
+            runTestsInFolder(fs.combine(path, v))
         else
-            local testingData = require("." .. turnPathIntoRequire(fs.combine(path, v)));
+            local testingData = require("." .. turnPathIntoRequire(fs.combine(path, v)))
 
             for title, test in pairs(testingData.tests) do
-                local result, errorMsg = pcall(test);
-                if result and errorMsg == true then
+                local result, errorTbl = xpcall(test, function(err)
+                    -- Capture the error and traceback from the test itself
+                    if showStackTrace then
+                        return {err, debug.traceback("", 2)}
+                    else 
+                        return {err}
+                    end
+                    
+                end)
+
+                if result and errorTbl == true then
                     if not hideSuccess then
-                        print(string.format("| Success | %s: %s", v, (testingData.titles[title] or title)));
+                        term.setTextColor(colors.green);
+                        print(string.format("| Success | %s: %s", v, (testingData.titles[title] or title)))
                     end
 
-                    successCount = successCount + 1;
-                    totalCount = totalCount + 1;
+                    successCount = successCount + 1
+                    totalCount = totalCount + 1
                 else
-                    print(string.format("| Failure | %s: %s", v, (testingData.titles[title] or title)));
+                    term.setTextColor(colors.red)
+                    print(string.format("| Failure | %s: %s", v, (testingData.titles[title] or title)))
 
-                    totalCount = totalCount + 1;
+                    totalCount = totalCount + 1
+
+                    -- Print error message with captured traceback
+                    if errorTbl then
+                        term.setTextColor(colors.lightGray);
+                        print("|  Note   | " .. errorTbl[1])
+                        
+                        if errorTbl[2] and showStackTrace then
+                            term.setTextColor(colors.gray);
+                            print(errorTbl[2])
+                        end
+                    end
                 end
 
-                if result == false and errorMsg then
-                    print(errorMsg);
-                end
+                term.setTextColor(colors.white);
             end
         end
     end
@@ -46,7 +71,7 @@ end
 print("Running tests...");
 print();
 
-runTestsInFolder(TESTS_FOLDER);
+runTestsInFolder(testsFolder);
 
 print()
 print(string.format("[%d/%d]", successCount, totalCount));
