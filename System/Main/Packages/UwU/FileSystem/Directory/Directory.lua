@@ -28,6 +28,10 @@ function Directory:getChildren()
     return self.__children;
 end
 
+function Directory:get(name)
+    return self.__children[name];
+end
+
 function Directory:findChildByName(name)
     if self.__children[name] then
         return self.__children[name];
@@ -78,6 +82,16 @@ end
 
 function Directory:__addToDrive()
     fs.makeDir(self.path);
+end
+
+function Directory:__updateChildren()
+    for _, child in pairs(self.__children) do 
+        child:__updatePath();
+
+        if child:isDirectory() then 
+            child:__updateChildren();
+        end
+    end
 end
 
 setmetatable(Directory, {

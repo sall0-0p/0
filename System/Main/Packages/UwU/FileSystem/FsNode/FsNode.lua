@@ -11,15 +11,17 @@ FsNode.className = "FsNode";
 FsNode.class = FsNode;
 
 -- Constructors
+
 function FsNode.new(displayName, parent)
     -- enforce existance of file
-    if parent and type(parent) == "table" and parent.className ~= "Directory" then
+    -- TODO: Add analogue of instanceof
+    if parent and type(parent) == "table" and not (parent.className == "Directory" or parent.className == "RootDirectory") then
         error("Parent must be a directory!");
     end
 
     -- check if such file already exists
     if parent and parent.__children[displayName] then
-        error(string.format("File %s already exists in directory %s"));
+        error(string.format("File %s already exists in directory %s", displayName, parent.displayName));
     end
 
     local node = setmetatable({}, FsNode);
@@ -59,6 +61,10 @@ function FsNode:move(newParent)
 
     if oldPath then
         fs.move(oldPath, self.path);
+    end
+
+    if self.__children then
+        self:__updateChildren()
     end
 
     -- FIXME: Update metadata
@@ -113,6 +119,10 @@ function FsNode:rename(newName)
     self.parent:addChild(self);
 
     fs.move(oldPath, self.path);
+
+    if self.__children then
+        self:__updateChildren()
+    end
 end
 
 -- getters, required as I am planning to use proxy tables.
@@ -137,7 +147,7 @@ function FsNode:__generatePath()
     local ancestor = self;
     local ancestors = {};
 
-    while ancestor do
+    while ancestor and ancestor.className ~= "RootDirectory" do
         table.insert(ancestors, ancestor);
         ancestor = ancestor.parent;
     end
@@ -149,6 +159,10 @@ function FsNode:__generatePath()
     end
 
     return result;
+end
+
+function FsNode:__updatePath()
+    self.path = self:__generatePath();
 end
 
 function FsNode:__simplifyName()
@@ -189,3 +203,4 @@ setmetatable(FsNode, {
 })
 
 return FsNode;
+

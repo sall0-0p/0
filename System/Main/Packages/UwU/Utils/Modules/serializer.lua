@@ -22,8 +22,16 @@ local function serialize(value, visited, indent)
         result[#result + 1] = "{\n"
 
         for k, v in pairs(value) do
-            local serializedKey = serialize(k, visited, nextIndent)
-            local serializedValue = serialize(v, visited, nextIndent)
+            local serializedKey
+            local serializedValue
+            if k == "parent" then
+                serializedKey = serialize(k, visited, nextIndent)
+                serializedValue = "<parent>"
+            else
+                serializedKey = serialize(k, visited, nextIndent)
+                serializedValue = serialize(v, visited, nextIndent)
+            end
+            
             result[#result + 1] = nextIndent .. "[" .. serializedKey .. "] = " .. serializedValue .. ",\n"
         end
 

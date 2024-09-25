@@ -62,6 +62,10 @@ local function runTestsInFolder(path)
 
                 term.setTextColor(colors.white);
             end
+
+            if testingData.cleanup then
+                testingData.cleanup();
+            end
         end
     end
 end

@@ -3,49 +3,62 @@ local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer")
 -- Test Suite for FileSystem Package (File and Directory)
 
 local ContentProvider = System:getContentProvider();
-
-local File = ContentProvider.get("UwU.FileSystem.File");
+local FileSystem = ContentProvider.get("UwU.FileSystem.Main");
 local Directory = ContentProvider.get("UwU.FileSystem.Directory");
+local File = ContentProvider.get("UwU.FileSystem.File");
+
+FileSystem();
+
+local root = FileSystem.getRoot();
+local testingDirectory = Directory("Testing", root);
+
+local tempDirCounter = 0
+
+local function getUniqueTempDirName()
+    tempDirCounter = tempDirCounter + 1
+    return "TempDir_" .. tempDirCounter
+end
+
+local function cleanupDirectory(dir)
+    dir:delete();
+end
 
 local tests = {};
 
--- Helper function to clean up the root directory
-local function cleanupDirectory(rootDir)
-    fs.delete("/Root");
-end
-
 -- Test creating a new file inside a directory
 local testFileCreation = function()
-    local rootDir = Directory.new("Root", nil)
-    local file = File.new("MyFile.txt", rootDir)
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local file = File.new("MyFile.txt", tempDir)
 
-    if rootDir:getChildCount() ~= 1 then
-        error("Child count is incorrect: expected 1, got " .. rootDir:getChildCount())
+    if tempDir:getChildCount() ~= 1 then
+        error("Child count is incorrect: expected 1, got " .. tempDir:getChildCount())
     end
-    if file:getPath() ~= "/Root/MyFile.txt" then
-        error("File path is incorrect: expected '/Root/MyFile.txt', got '" .. file:getPath() .. "'")
+    if file:getPath() ~= tempDir:getPath() .. "/MyFile.txt" then
+        error("File path is incorrect: expected '" .. tempDir:getPath() .. "/MyFile.txt', got '" .. file:getPath() .. "'")
     end
 
     -- Check file existence in CraftOS file system
     if not fs.exists(file:getPath()) then
         error("File does not exist in the CraftOS file system at path: " .. file:getPath())
     end
-    
+
     -- Cleanup
-    cleanupDirectory(rootDir)
+    cleanupDirectory(tempDir)
     return true;
 end
 
 -- Test creating a new directory inside another directory
 local testDirectoryCreation = function()
-    local rootDir = Directory.new("Root", nil)
-    local subDir = Directory.new("SubDir", rootDir)
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local subDir = Directory.new("SubDir", tempDir)
 
-    if rootDir:getChildCount() ~= 1 then
-        error("Child count is incorrect: expected 1, got " .. rootDir:getChildCount())
+    if tempDir:getChildCount() ~= 1 then
+        error("Child count is incorrect: expected 1, got " .. tempDir:getChildCount())
     end
-    if subDir:getPath() ~= "/Root/SubDir" then
-        error("Sub-directory path is incorrect: expected '/Root/SubDir', got '" .. subDir:getPath() .. "'")
+    if subDir:getPath() ~= tempDir:getPath() .. "/SubDir" then
+        error("Sub-directory path is incorrect: expected '" .. tempDir:getPath() .. "/SubDir', got '" .. subDir:getPath() .. "'")
     end
 
     -- Check directory existence in CraftOS file system
@@ -54,92 +67,96 @@ local testDirectoryCreation = function()
     end
 
     -- Cleanup
-    cleanupDirectory(rootDir)
+    cleanupDirectory(tempDir)
     return true;
 end
 
 -- Test moving a file to another directory
 local testFileMove = function()
-    local rootDir = Directory.new("Root", nil)
-    local subDir = Directory.new("SubDir", rootDir)
-    local file = File.new("MyFile.txt", rootDir)
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local subDir = Directory.new("SubDir", tempDir)
+    local file = File.new("MyFile.txt", tempDir)
 
     file:move(subDir)
 
     if subDir:getChildCount() ~= 1 then
         error("Child count in SubDir is incorrect: expected 1, got " .. subDir:getChildCount())
     end
-    if file:getPath() ~= "/Root/SubDir/MyFile.txt" then
-        error("File path after move is incorrect: expected '/Root/SubDir/MyFile.txt', got '" .. file:getPath() .. "'")
+    if file:getPath() ~= subDir:getPath() .. "/MyFile.txt" then
+        error("File path after move is incorrect: expected '" .. subDir:getPath() .. "/MyFile.txt', got '" .. file:getPath() .. "'")
     end
 
     -- Check if the file was correctly moved in the CraftOS file system
     if not fs.exists(file:getPath()) then
         error("Moved file does not exist in the CraftOS file system at path: " .. file:getPath())
     end
-    
+
     -- Cleanup
-    cleanupDirectory(rootDir)
+    cleanupDirectory(tempDir)
     return true;
 end
 
 -- Test copying a file to another directory
 local testFileCopy = function()
-    local rootDir = Directory.new("Root", nil)
-    local subDir = Directory.new("SubDir", rootDir)
-    local file = File.new("MyFile.txt", rootDir)
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local subDir = Directory.new("SubDir", tempDir)
+    local file = File.new("MyFile.txt", tempDir)
 
     local copyFile = file:copy(subDir)
 
     if subDir:getChildCount() ~= 1 then
         error("Child count in SubDir is incorrect: expected 1, got " .. subDir:getChildCount())
     end
-    if copyFile:getPath() ~= "/Root/SubDir/MyFile.txt" then
-        error("Copy file path is incorrect: expected '/Root/SubDir/MyFile.txt', got '" .. copyFile:getPath() .. "'")
+    if copyFile:getPath() ~= subDir:getPath() .. "/MyFile.txt" then
+        error("Copy file path is incorrect: expected '" .. subDir:getPath() .. "/MyFile.txt', got '" .. copyFile:getPath() .. "'")
     end
 
     -- Check if the file was correctly copied in the CraftOS file system
     if not fs.exists(copyFile:getPath()) then
         error("Copied file does not exist in the CraftOS file system at path: " .. copyFile:getPath())
     end
-    
+
     -- Cleanup
-    cleanupDirectory(rootDir)
+    cleanupDirectory(tempDir)
     return true;
 end
 
 -- Test deleting a file from a directory
 local testFileDelete = function()
-    local rootDir = Directory.new("Root", nil)
-    local file = File.new("MyFile.txt", rootDir)
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local file = File.new("MyFile.txt", tempDir)
 
     file:delete()
 
-    if rootDir:getChildCount() ~= 0 then
-        error("Child count after deletion is incorrect: expected 0, got " .. rootDir:getChildCount())
+    if tempDir:getChildCount() ~= 0 then
+        error("Child count after deletion is incorrect: expected 0, got " .. tempDir:getChildCount())
     end
 
     -- Check if the file was deleted in the CraftOS file system
     if fs.exists(file:getPath()) then
         error("File was not deleted from the CraftOS file system at path: " .. file:getPath())
     end
-    
+
     -- Cleanup
-    cleanupDirectory(rootDir)
+    cleanupDirectory(tempDir)
     return true;
 end
 
 -- Test renaming a file
 local testFileRename = function()
-    local rootDir = Directory.new("Root", nil)
-    local file = File.new("MyFile.txt", rootDir)
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local file = File.new("MyFile.txt", tempDir)
 
     file:rename("NewFile.txt")
 
-    if file:getPath() ~= "/Root/NewFile.txt" then
-        error("File path after rename is incorrect: expected '/Root/NewFile.txt', got '" .. file:getPath() .. "'")
+    if file:getPath() ~= tempDir:getPath() .. "/NewFile.txt" then
+        error("File path after rename is incorrect: expected '" .. tempDir:getPath() .. "/NewFile.txt', got '" .. file:getPath() .. "'")
     end
-    if rootDir:findChildByName("NewFile.txt") ~= file then
+    if tempDir:findChildByName("NewFile.txt") ~= file then
         error("File rename not reflected in parent's children.")
     end
 
@@ -149,25 +166,26 @@ local testFileRename = function()
     end
 
     -- Cleanup
-    cleanupDirectory(rootDir)
+    cleanupDirectory(tempDir)
     return true;
 end
 
 -- Test FsNode: isDirectory for File and Directory
 local testIsDirectory = function()
-    local rootDir = Directory.new("Root", nil)
-    local file = File.new("MyFile.txt", rootDir)
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local file = File.new("MyFile.txt", tempDir)
 
-    if rootDir:isDirectory() ~= true then
-        error("Root directory isDirectory check failed: expected true, got false")
+    if tempDir:isDirectory() ~= true then
+        error("Directory isDirectory check failed: expected true, got false")
     end
     if file:isDirectory() ~= false then
         error("File isDirectory check failed: expected false, got true")
     end
 
     -- Check directory existence in CraftOS file system
-    if not fs.exists(rootDir:getPath()) then
-        error("Root directory does not exist in the CraftOS file system at path: " .. rootDir:getPath())
+    if not fs.exists(tempDir:getPath()) then
+        error("Directory does not exist in the CraftOS file system at path: " .. tempDir:getPath())
     end
 
     -- Check file existence in CraftOS file system
@@ -176,20 +194,21 @@ local testIsDirectory = function()
     end
 
     -- Cleanup
-    cleanupDirectory(rootDir)
+    cleanupDirectory(tempDir)
     return true;
 end
 
 -- Test FsNode: getPath method
 local testGetPath = function()
-    local rootDir = Directory.new("Root", nil)
-    local file = File.new("MyFile.txt", rootDir)
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local file = File.new("MyFile.txt", tempDir)
 
-    if file:getPath() ~= "/Root/MyFile.txt" then
-        error("File getPath returned wrong path: expected '/Root/MyFile.txt', got '" .. file:getPath() .. "'")
+    if file:getPath() ~= tempDir:getPath() .. "/MyFile.txt" then
+        error("File getPath returned wrong path: expected '" .. tempDir:getPath() .. "/MyFile.txt', got '" .. file:getPath() .. "'")
     end
-    if rootDir:getPath() ~= "/Root" then
-        error("Root directory getPath returned wrong path: expected '/Root', got '" .. rootDir:getPath() .. "'")
+    if tempDir:getPath() ~= testingDirectory:getPath() .. "/" .. tempDirName then
+        error("Directory getPath returned wrong path: expected '" .. testingDirectory:getPath() .. "/" .. tempDirName .. "', got '" .. tempDir:getPath() .. "'")
     end
 
     -- Check file existence in CraftOS file system
@@ -198,19 +217,20 @@ local testGetPath = function()
     end
 
     -- Check directory existence in CraftOS file system
-    if not fs.exists(rootDir:getPath()) then
-        error("Root directory does not exist in the CraftOS file system at path: " .. rootDir:getPath())
+    if not fs.exists(tempDir:getPath()) then
+        error("Directory does not exist in the CraftOS file system at path: " .. tempDir:getPath())
     end
 
     -- Cleanup
-    cleanupDirectory(rootDir)
+    cleanupDirectory(tempDir)
     return true;
 end
 
 -- Test FsNode: isReadOnly method
 local testIsReadOnly = function()
-    local rootDir = Directory.new("Root", nil)
-    local file = File.new("MyFile.txt", rootDir)
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local file = File.new("MyFile.txt", tempDir)
 
     if file.isReadOnly ~= false then
         error("File isReadOnly check failed: expected false, got true")
@@ -220,23 +240,24 @@ local testIsReadOnly = function()
     if not fs.exists(file:getPath()) then
         error("File does not exist in the CraftOS file system at path: " .. file:getPath())
     end
-    
+
     -- Cleanup
-    cleanupDirectory(rootDir)
+    cleanupDirectory(tempDir)
     return true;
 end
 
--- Test FsNode: rename a directory
+-- Test renaming a directory
 local testDirectoryRename = function()
-    local rootDir = Directory.new("Root", nil)
-    local subDir = Directory.new("SubDir", rootDir)
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local subDir = Directory.new("SubDir", tempDir)
 
     subDir:rename("RenamedDir")
 
-    if subDir:getPath() ~= "/Root/RenamedDir" then
-        error("Directory rename failed: expected '/Root/RenamedDir', got '" .. subDir:getPath() .. "'")
+    if subDir:getPath() ~= tempDir:getPath() .. "/RenamedDir" then
+        error("Directory rename failed: expected '" .. tempDir:getPath() .. "/RenamedDir', got '" .. subDir:getPath() .. "'")
     end
-    if rootDir:findChildByName("RenamedDir") ~= subDir then
+    if tempDir:findChildByName("RenamedDir") ~= subDir then
         error("Directory rename not reflected in parent's children.")
     end
 
@@ -244,16 +265,17 @@ local testDirectoryRename = function()
     if not fs.exists(subDir:getPath()) then
         error("Renamed directory does not exist in the CraftOS file system at path: " .. subDir:getPath())
     end
-    
+
     -- Cleanup
-    cleanupDirectory(rootDir)
+    cleanupDirectory(tempDir)
     return true;
 end
 
 -- Test clearing a directory
 local testDirectoryClear = function()
-    local rootDir = Directory.new("Root", nil)
-    local subDir = Directory.new("SubDir", rootDir)
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local subDir = Directory.new("SubDir", tempDir)
     local file1 = File.new("File1.txt", subDir)
     local file2 = File.new("File2.txt", subDir)
 
@@ -267,9 +289,9 @@ local testDirectoryClear = function()
     if fs.exists(file1:getPath()) or fs.exists(file2:getPath()) then
         error("Files were not deleted from the CraftOS file system after clearing the directory")
     end
-    
+
     -- Cleanup
-    cleanupDirectory(rootDir)
+    cleanupDirectory(tempDir)
     return true;
 end
 
@@ -300,5 +322,8 @@ return {
         testIsReadOnly = "Test isReadOnly method for File and Directory",
         testDirectoryRename = "Test renaming a directory",
         testDirectoryClear = "Test clearing all children from a directory"
-    }
+    },
+    cleanup = function() 
+        testingDirectory:delete();
+    end
 }
