@@ -74,9 +74,12 @@ end
 -- Test moving a file to another directory
 local testFileMove = function()
     local tempDirName = getUniqueTempDirName()
-    local tempDir = Directory.new(tempDirName, testingDirectory)
-    local subDir = Directory.new("SubDir", tempDir)
-    local file = File.new("MyFile.txt", tempDir)
+    local tempDir = Directory(tempDirName, testingDirectory)
+    local subDir = Directory("SubDir", tempDir)
+    local file = File("MyFile.txt", tempDir)
+
+    print(serializer(file));
+    print(serializer(subDir));
 
     file:move(subDir)
 

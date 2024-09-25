@@ -1,3 +1,5 @@
+local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer");
+
 ---@class FsNode
 ---@field displayName string
 ---@field simplifiedName string
@@ -12,7 +14,7 @@ FsNode.class = FsNode;
 
 -- Constructors
 
-function FsNode.new(displayName, parent)
+function FsNode.construct(displayName, parent)
     -- enforce existance of file
     -- TODO: Add analogue of instanceof
     if parent and type(parent) == "table" and not (parent.className == "Directory" or parent.className == "RootDirectory") then
@@ -36,6 +38,12 @@ function FsNode.new(displayName, parent)
     end
 
     return node;
+end
+
+function FsNode.new(displayName, parent)
+    local node = FsNode.construct(displayName, parent);
+
+    return node:__generateProxy();
 end
 
 -- Public methods
@@ -169,6 +177,31 @@ function FsNode:__simplifyName()
     local simplifiedName = self.displayName:gsub("%s", "_");
     simplifiedName = simplifiedName:gsub("[^%w_.-]", "");
     return simplifiedName;
+end
+
+function FsNode:__generateProxy()
+    local proxy = setmetatable({}, {
+        __index = function (proxy, key)
+            if self:isDirectory() then
+                if self.__children[key] then
+                    return self.__children[key];
+                end
+            end
+
+            return self[key];
+        end,
+
+        __newindex = function (proxy, key, value)
+            if key == "parent" then
+                self:move(value);
+            else 
+                rawset(self, key, value);
+            end
+        end
+    })
+
+    self.proxy = proxy;
+    return proxy;
 end
 
 function FsNode:__addToDrive()

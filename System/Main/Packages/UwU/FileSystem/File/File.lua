@@ -9,8 +9,8 @@ File.__index = File;
 
 -- Constructors
 
-function File.new(name, parent)
-    local file = setmetatable(FsNode(name, parent), File);
+function File.construct(name, parent)
+    local file = setmetatable(FsNode.construct(name, parent), File);
     file.className = "File";
     file.class = File;
 
@@ -19,6 +19,12 @@ function File.new(name, parent)
     end
 
     return file;
+end
+
+function File.new(name, parent)
+    local file = File.construct(name, parent);
+
+    return file:__generateProxy();
 end
 
 -- Public methods

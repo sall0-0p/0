@@ -1,3 +1,5 @@
+local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer");
+
 local ContentProvider = System.getContentProvider();
 local FsNode = ContentProvider.get("UwU.FileSystem.FsNode");
 
@@ -9,8 +11,8 @@ local Directory = {};
 Directory.__index = Directory;
 
 -- Constructors
-function Directory.new(name, parent)
-    local directory = setmetatable(FsNode(name, parent), Directory);
+function Directory.construct(name, parent)
+    local directory = setmetatable(FsNode.construct(name, parent), Directory);
     directory.__children = {};
     directory.className = "Directory";
     directory.class = Directory;
@@ -20,6 +22,12 @@ function Directory.new(name, parent)
     end
 
     return directory;
+end
+
+function Directory.new(name, parent)
+    local directory = Directory.construct(name, parent);
+
+    return directory:__generateProxy();
 end
 
 -- Public methods
@@ -74,6 +82,8 @@ end
 
 function Directory:removeChild(object)
     if not self.__children[object.displayName] then
+        print(serializer(self.__children));
+        print(object.displayName);
         error("This child is not present here!");
     end
 
