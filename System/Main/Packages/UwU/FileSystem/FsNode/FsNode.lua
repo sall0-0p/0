@@ -1,3 +1,5 @@
+local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer");
+
 ---@class FsNode
 ---@field displayName string
 ---@field simplifiedName string
@@ -12,7 +14,7 @@ FsNode.class = FsNode;
 
 -- Constructors
 
-function FsNode.new(displayName, parent)
+function FsNode.construct(displayName, parent)
     -- enforce existance of file
     -- TODO: Add analogue of instanceof
     if parent and type(parent) == "table" and not (parent.className == "Directory" or parent.className == "RootDirectory") then
@@ -31,11 +33,18 @@ function FsNode.new(displayName, parent)
     node.path = node:__generatePath();
     node.isReadOnly = fs.isReadOnly(node.path);
 
+    return node;
+end
+
+function FsNode.new(displayName, parent)
+    local node = FsNode.construct(displayName, parent);
+    local proxy = node:__generateProxy()
+
     if parent then
-        parent.__children[displayName] = node;
+        parent.__children[displayName] = proxy;
     end
 
-    return node;
+    return proxy;
 end
 
 -- Public methods
@@ -44,18 +53,23 @@ function FsNode:isDirectory()
 end
 
 function FsNode:move(newParent)
+    if newParent == nil then
+        self:delete();
+        return
+    end
+
     -- FIXME: Add checks
-    if not (newParent and newParent.className == "Directory") then
+    if newParent and not newParent.className == "Directory" then
         error("newParent has to be a directory!");
     end
 
     local oldPath = self.path;
     if self.parent then
-        self.parent:removeChild(self);
+        self.parent:removeChild(self.proxy);
     end
 
-    newParent:addChild(self);
-    self.parent = newParent;
+    newParent:addChild(self.proxy);
+    rawset(self, "parent", newParent);
     self.path = self:__generatePath();
     self.readOnly = fs.isReadOnly(self.path);
 
@@ -81,7 +95,8 @@ function FsNode:copy(newParent)
     end
 
     local newNode = self:__clone();
-    newNode:move(newParent);
+    local newNodeProxy = newNode:__generateProxy();
+    newNodeProxy:move(newParent);
 
     if newNode.path then
         fs.copy(self.path, newNode.path);
@@ -92,8 +107,7 @@ end
 
 function FsNode:delete()
     if self.parent then
-        -- self.parent.__children[self.displayName] = nil;
-        self.parent:removeChild(self);
+        self.parent:removeChild(self.proxy);
     end
 
     if self.path then
@@ -112,11 +126,11 @@ function FsNode:rename(newName)
 
     local oldPath = self.path;
     
-    self.parent:removeChild(self);
+    self.parent:removeChild(self.proxy);
     self.displayName = newName;
     self.simplifiedName = self:__simplifyName();
     self.path = self:__generatePath();
-    self.parent:addChild(self);
+    self.parent:addChild(self.proxy);
 
     fs.move(oldPath, self.path);
 
@@ -169,6 +183,31 @@ function FsNode:__simplifyName()
     local simplifiedName = self.displayName:gsub("%s", "_");
     simplifiedName = simplifiedName:gsub("[^%w_.-]", "");
     return simplifiedName;
+end
+
+function FsNode:__generateProxy()
+    local proxy = setmetatable({}, {
+        __index = function (proxy, key)
+            if self:isDirectory() then
+                if self.__children[key] then
+                    return self.__children[key];
+                end
+            end
+
+            return self[key];
+        end,
+
+        __newindex = function (proxy, key, value)
+            if key == "parent" then
+                self:move(value);
+            else 
+                rawset(self, key, value);
+            end
+        end
+    })
+
+    self.proxy = proxy;
+    return proxy;
 end
 
 function FsNode:__addToDrive()

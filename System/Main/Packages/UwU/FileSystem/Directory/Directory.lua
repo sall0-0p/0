@@ -1,3 +1,5 @@
+local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer");
+
 local ContentProvider = System.getContentProvider();
 local FsNode = ContentProvider.get("UwU.FileSystem.FsNode");
 
@@ -9,8 +11,8 @@ local Directory = {};
 Directory.__index = Directory;
 
 -- Constructors
-function Directory.new(name, parent)
-    local directory = setmetatable(FsNode(name, parent), Directory);
+function Directory.construct(name, parent)
+    local directory = setmetatable(FsNode.construct(name, parent), Directory);
     directory.__children = {};
     directory.className = "Directory";
     directory.class = Directory;
@@ -20,6 +22,17 @@ function Directory.new(name, parent)
     end
 
     return directory;
+end
+
+function Directory.new(name, parent)
+    local directory = Directory.construct(name, parent);
+    local proxy = directory:__generateProxy();
+
+    if parent then
+        parent.__children[name] = proxy;
+    end
+
+    return proxy;
 end
 
 -- Public methods
@@ -65,7 +78,7 @@ end
 
 -- Private methods
 function Directory:addChild(object)
-    if self.__children[object.displayName] then
+    if self.__children[object.displayName] ~= nil then
         error("Such child already exists!");
     end
 
@@ -73,7 +86,7 @@ function Directory:addChild(object)
 end
 
 function Directory:removeChild(object)
-    if not self.__children[object.displayName] then
+    if self.__children[object.displayName] == nil then
         error("This child is not present here!");
     end
 

@@ -1,3 +1,5 @@
+local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer");
+
 local ContentProvider = System.getContentProvider();
 local Directory = ContentProvider.get("UwU.FileSystem.Directory");
 
@@ -9,7 +11,7 @@ RootDirectory.__index = Directory;
 
 -- Constructors
 function RootDirectory.new(name)
-    local directory = setmetatable(Directory(name, nil), RootDirectory);
+    local directory = setmetatable(Directory.construct(name, nil), RootDirectory);
     directory.__children = {};
     directory.className = "RootDirectory";
     directory.class = RootDirectory;
@@ -18,7 +20,7 @@ function RootDirectory.new(name)
         directory:__addToDrive();
     end
 
-    return directory;
+    return directory:__generateProxy();
 end
 
 -- Public methods
