@@ -32,13 +32,13 @@ function FileMetadata:toTable()
     end
 
     return {
-        [1] = self.displayName;
-        [2] = self.permissions;
-        [3] = resolveDefaultPermissions();
-        [5] = self.size;
-        [6] = self.linkedTo;
+        ["1"] = self.displayName;
+        ["2"] = self.permissions;
+        ["3"] = resolveDefaultPermissions();
+        ["5"] = self.size;
+        ["6"] = self.linkedTo;
 
-        [0] = self.custom;
+        ["0"] = self.custom;
     }
 end
 

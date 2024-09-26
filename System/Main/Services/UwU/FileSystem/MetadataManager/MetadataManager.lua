@@ -8,6 +8,7 @@ local MetadataManager = {};
 
 local METADATA_SAVE_LOCATION = "/System/Config/fs_metadata.tbl";
 local metadata = {};
+local metadataFile;
 local function init()
     local file = fs.open(METADATA_SAVE_LOCATION, "r");
     local metadataRaw = file.readAll();
@@ -17,6 +18,13 @@ local function init()
     end
 
     file.close();
+end
+
+local function flushData()
+    metadataFile = fs.open(METADATA_SAVE_LOCATION, "w");
+    metadataFile.write(textutils.serialise(metadata));
+    metadataFile.flush();
+    metadataFile.close();
 end
 
 function MetadataManager.buildMeta(object)
@@ -40,6 +48,9 @@ function MetadataManager.buildMeta(object)
         newMeta.created = rawMeta.created;
         newMeta.modified = rawMeta.modified;
 
+        metadata[object.path] = newMeta:toTable();
+        flushData();
+
         return newMeta;
     end
 end
@@ -47,18 +58,17 @@ end
 function MetadataManager.changeMeta(oldPath, newPath, data)
     metadata[oldPath] = nil;
     metadata[newPath] = data:toTable();
-    local file = fs.open(METADATA_SAVE_LOCATION, "w");
-
-    file.write(textutils.serialise(metadata));
-    file.close();
+    flushData();
 end
 
 function MetadataManager.updateMeta(object, data)
     metadata[object.path] = data:toTable();
-    local file = fs.open(METADATA_SAVE_LOCATION, "w");
+    flushData();
+end
 
-    file.write(textutils.serialise(metadata));
-    file.close();
+function MetadataManager.clean(object)
+    metadata[object.path] = nil;
+    flushData();
 end
 
 return setmetatable(MetadataManager, {
