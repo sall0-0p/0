@@ -1,3 +1,5 @@
+local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer");
+
 local ContentProvider = System.getContentProvider();
 local Metadata = ContentProvider.get("UwU.FileSystem.Metadata.Metadata");
 
@@ -42,7 +44,7 @@ end
 setmetatable(DirectoryMetadata, {
     __index = Metadata;
     __call = function(cls, ...) 
-        cls.new(...);
+        return cls.new(...);
     end
 })
 

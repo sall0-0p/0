@@ -4,8 +4,12 @@ local FsNode = ContentProvider.get("UwU.FileSystem.FsNode");
 ---@class File
 ---@field className string
 ---@field class table
+---@field metadata table
 local File = {};
 File.__index = File;
+
+--FIXME: Change to ContentProvider!!!
+local MetadataManager = require(".System.Main.Services.UwU.FileSystem.MetadataManager.MetadataManager");
 
 -- Constructors
 
@@ -28,6 +32,8 @@ function File.new(name, parent)
     if parent then
         parent.__children[name] = proxy;
     end
+
+    file.metadata = MetadataManager.buildMeta(file);
 
     return proxy;
 end

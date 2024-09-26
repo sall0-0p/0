@@ -1,3 +1,5 @@
+local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer");
+
 --- @class Metadata
 --- @field displayName string
 --- @field permissions table
@@ -33,7 +35,7 @@ end
 Metadata.DEFAULT_PERMISSIONS = DEFAULT_PERMISSIONS;
 setmetatable(Metadata, {
     __call = function(cls, ...) 
-        cls.new(...);
+        return cls.new(...);
     end
 })
 

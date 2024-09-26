@@ -3,10 +3,14 @@ local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer")
 local ContentProvider = System.getContentProvider();
 local FsNode = ContentProvider.get("UwU.FileSystem.FsNode");
 
+--FIXME: Change to ContentProvider!!!
+local MetadataManager = require(".System.Main.Services.UwU.FileSystem.MetadataManager.MetadataManager");
+
 ---@class Directory
 ---@field __children table
 ---@field className string
 ---@field class table
+---@field metadata table
 local Directory = {};
 Directory.__index = Directory;
 
@@ -31,6 +35,8 @@ function Directory.new(name, parent)
     if parent then
         parent.__children[name] = proxy;
     end
+
+    directory.metadata = MetadataManager.buildMeta(directory);
 
     return proxy;
 end

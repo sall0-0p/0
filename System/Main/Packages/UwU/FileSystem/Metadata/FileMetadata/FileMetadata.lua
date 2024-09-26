@@ -45,7 +45,7 @@ end
 setmetatable(FileMetadata, {
     __index = Metadata;
     __call = function(cls, ...) 
-        cls.new(...);
+        return cls.new(...);
     end
 })
 
