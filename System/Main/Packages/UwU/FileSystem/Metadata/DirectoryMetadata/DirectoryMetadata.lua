@@ -31,13 +31,22 @@ function DirectoryMetadata:toTable()
         end
     end
 
+    local function resolveEmpty(value) 
+        if next(value) == nil then
+            return nil;
+        else 
+            return value;
+        end
+    end
+
+
     return {
         ["1"] = self.displayName;
-        ["2"] = self.permissions;
+        ["2"] = resolveEmpty(self.permissions);
         ["3"] = resolveDefaultPermissions();
         ["6"] = self.linkedTo;
 
-        ["0"] = self.custom;
+        ["0"] = resolveEmpty(self.custom);
     }
 end
 
