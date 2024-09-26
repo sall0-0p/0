@@ -15,16 +15,12 @@ function RootDirectory.new(name)
     directory.__children = {};
     directory.className = "RootDirectory";
     directory.class = RootDirectory;
-
-    -- print(serializer(directory))
-    -- print(serializer(getmetatable(directory)))
-    -- print(directory.path);
     
     if not fs.exists(directory.path) then
         directory:__addToDrive();
     end
 
-    return directory;
+    return directory:__generateProxy();
 end
 
 -- Public methods

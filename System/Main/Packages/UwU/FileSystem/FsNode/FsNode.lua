@@ -33,17 +33,18 @@ function FsNode.construct(displayName, parent)
     node.path = node:__generatePath();
     node.isReadOnly = fs.isReadOnly(node.path);
 
-    if parent then
-        parent.__children[displayName] = node;
-    end
-
     return node;
 end
 
 function FsNode.new(displayName, parent)
     local node = FsNode.construct(displayName, parent);
+    local proxy = node:__generateProxy()
 
-    return node:__generateProxy();
+    if parent then
+        parent.__children[displayName] = proxy;
+    end
+
+    return proxy;
 end
 
 -- Public methods
@@ -52,18 +53,23 @@ function FsNode:isDirectory()
 end
 
 function FsNode:move(newParent)
+    if newParent == nil then
+        self:delete();
+        return
+    end
+
     -- FIXME: Add checks
-    if not (newParent and newParent.className == "Directory") then
+    if newParent and not newParent.className == "Directory" then
         error("newParent has to be a directory!");
     end
 
     local oldPath = self.path;
     if self.parent then
-        self.parent:removeChild(self);
+        self.parent:removeChild(self.proxy);
     end
 
-    newParent:addChild(self);
-    self.parent = newParent;
+    newParent:addChild(self.proxy);
+    rawset(self, "parent", newParent);
     self.path = self:__generatePath();
     self.readOnly = fs.isReadOnly(self.path);
 
@@ -89,7 +95,8 @@ function FsNode:copy(newParent)
     end
 
     local newNode = self:__clone();
-    newNode:move(newParent);
+    local newNodeProxy = newNode:__generateProxy();
+    newNodeProxy:move(newParent);
 
     if newNode.path then
         fs.copy(self.path, newNode.path);
@@ -100,8 +107,7 @@ end
 
 function FsNode:delete()
     if self.parent then
-        -- self.parent.__children[self.displayName] = nil;
-        self.parent:removeChild(self);
+        self.parent:removeChild(self.proxy);
     end
 
     if self.path then
@@ -120,11 +126,11 @@ function FsNode:rename(newName)
 
     local oldPath = self.path;
     
-    self.parent:removeChild(self);
+    self.parent:removeChild(self.proxy);
     self.displayName = newName;
     self.simplifiedName = self:__simplifyName();
     self.path = self:__generatePath();
-    self.parent:addChild(self);
+    self.parent:addChild(self.proxy);
 
     fs.move(oldPath, self.path);
 

@@ -23,8 +23,13 @@ end
 
 function File.new(name, parent)
     local file = File.construct(name, parent);
+    local proxy = file:__generateProxy();
 
-    return file:__generateProxy();
+    if parent then
+        parent.__children[name] = proxy;
+    end
+
+    return proxy;
 end
 
 -- Public methods

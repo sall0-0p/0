@@ -26,8 +26,13 @@ end
 
 function Directory.new(name, parent)
     local directory = Directory.construct(name, parent);
+    local proxy = directory:__generateProxy();
 
-    return directory:__generateProxy();
+    if parent then
+        parent.__children[name] = proxy;
+    end
+
+    return proxy;
 end
 
 -- Public methods
@@ -73,7 +78,7 @@ end
 
 -- Private methods
 function Directory:addChild(object)
-    if self.__children[object.displayName] then
+    if self.__children[object.displayName] ~= nil then
         error("Such child already exists!");
     end
 
@@ -81,9 +86,7 @@ function Directory:addChild(object)
 end
 
 function Directory:removeChild(object)
-    if not self.__children[object.displayName] then
-        print(serializer(self.__children));
-        print(object.displayName);
+    if self.__children[object.displayName] == nil then
         error("This child is not present here!");
     end
 

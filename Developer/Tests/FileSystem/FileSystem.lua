@@ -78,14 +78,12 @@ local testFileMove = function()
     local subDir = Directory("SubDir", tempDir)
     local file = File("MyFile.txt", tempDir)
 
-    print(serializer(file));
-    print(serializer(subDir));
-
-    file:move(subDir)
+    file:move(subDir);
 
     if subDir:getChildCount() ~= 1 then
         error("Child count in SubDir is incorrect: expected 1, got " .. subDir:getChildCount())
     end
+
     if file:getPath() ~= subDir:getPath() .. "/MyFile.txt" then
         error("File path after move is incorrect: expected '" .. subDir:getPath() .. "/MyFile.txt', got '" .. file:getPath() .. "'")
     end
@@ -98,6 +96,46 @@ local testFileMove = function()
     -- Cleanup
     cleanupDirectory(tempDir)
     return true;
+end
+
+local testParentAssignmentMovesFile = function()
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local subDir = Directory.new("SubDir", tempDir)
+    local file = File.new("MyFile.txt", tempDir)
+
+    -- Set the file's parent to subDir (this should trigger file:move(subDir))
+    file.parent = subDir
+
+    if file:getPath() ~= subDir:getPath() .. "/MyFile.txt" then
+        error("File path after parent assignment is incorrect: expected '" .. subDir:getPath() .. "/MyFile.txt', got '" .. file:getPath() .. "'")
+    end
+
+    -- Check if the file was moved in the CraftOS file system
+    if not fs.exists(file:getPath()) then
+        error("File does not exist in the CraftOS file system after move at path: " .. file:getPath())
+    end
+
+    -- Cleanup
+    cleanupDirectory(tempDir)
+    return true
+end
+
+local testBracketAccessGetsFile = function()
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local file = File.new("MyFile.txt", tempDir)
+
+    -- Access the file through bracket notation (this should trigger directory:get("MyFile.txt"))
+    local retrievedFile = tempDir["MyFile.txt"]
+
+    if retrievedFile ~= file then
+        error("Retrieved file via bracket notation is incorrect")
+    end
+
+    -- Cleanup
+    cleanupDirectory(tempDir)
+    return true
 end
 
 -- Test copying a file to another directory
@@ -147,6 +185,29 @@ local testFileDelete = function()
     cleanupDirectory(tempDir)
     return true;
 end
+
+local testParentNilDeletesFile = function()
+    local tempDirName = getUniqueTempDirName()
+    local tempDir = Directory.new(tempDirName, testingDirectory)
+    local file = File.new("MyFile.txt", tempDir)
+
+    -- Set the file's parent to nil (this should trigger file:delete())
+    file.parent = nil
+
+    if tempDir:getChildCount() ~= 0 then
+        error("Child count after setting parent to nil is incorrect: expected 0, got " .. tempDir:getChildCount())
+    end
+
+    -- Check if the file was deleted in the CraftOS file system
+    if fs.exists(file:getPath()) then
+        error("File was not deleted from the CraftOS file system after setting parent to nil")
+    end
+
+    -- Cleanup
+    cleanupDirectory(tempDir)
+    return true
+end
+
 
 -- Test renaming a file
 local testFileRename = function()
@@ -310,6 +371,9 @@ tests.testGetPath = testGetPath
 tests.testIsReadOnly = testIsReadOnly
 tests.testDirectoryRename = testDirectoryRename
 tests.testDirectoryClear = testDirectoryClear
+tests.testParentAssignmentMovesFile = testParentAssignmentMovesFile
+tests.testBracketAccessGetsFile = testBracketAccessGetsFile
+tests.testParentNilDeletesFile = testParentNilDeletesFile
 
 return {
     tests = tests,
@@ -324,7 +388,10 @@ return {
         testGetPath = "Test getPath method for File and Directory",
         testIsReadOnly = "Test isReadOnly method for File and Directory",
         testDirectoryRename = "Test renaming a directory",
-        testDirectoryClear = "Test clearing all children from a directory"
+        testDirectoryClear = "Test clearing all children from a directory",
+        testParentAssignmentMovesFile = "Test assigning parent triggers file:move()",
+        testBracketAccessGetsFile = "Test bracket access triggers directory:get()",
+        testParentNilDeletesFile = "Test assigning nil to parent triggers file:delete()"
     },
     cleanup = function() 
         testingDirectory:delete();
