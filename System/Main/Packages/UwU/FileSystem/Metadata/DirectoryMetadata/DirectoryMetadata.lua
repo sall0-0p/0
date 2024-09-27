@@ -15,9 +15,11 @@ function DirectoryMetadata.new(directory, permissions, custom, linkedTo)
 end
 
 function DirectoryMetadata.fromTable(data)
-    local metadata = setmetatable(Metadata(data[1], data[2], data[0]), DirectoryMetadata);
-    metadata.linkedTo = data[6];
-    metadata.defaultPermissions = data[3] or Metadata.DEFAULT_PERMISSIONS;
+    local metadata = setmetatable(Metadata(data["1"], data["2"], data["0"]), DirectoryMetadata);
+    metadata.linkedTo = data["6"];
+    metadata.defaultPermissions = data["3"] or Metadata.DEFAULT_PERMISSIONS;
+    metadata.permissions = data["2"] or {};
+    metadata.custom = data["0"] or {};
 
     return metadata;
 end

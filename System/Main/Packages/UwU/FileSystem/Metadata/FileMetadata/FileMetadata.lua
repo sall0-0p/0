@@ -14,10 +14,12 @@ function FileMetadata.new(file, permissions, custom, linkedTo)
 end
 
 function FileMetadata.fromTable(data)
-    local metadata = setmetatable(Metadata(data[1], data[2], data[0]), FileMetadata);
-    metadata.size = data[5];
-    metadata.linkedTo = data[6];
-    metadata.defaultPermissions = data[3] or Metadata.DEFAULT_PERMISSIONS;
+    local metadata = setmetatable(Metadata(data["1"], data["2"], data["0"]), FileMetadata);
+    metadata.size = data["5"];
+    metadata.linkedTo = data["6"];
+    metadata.defaultPermissions = data["3"] or Metadata.DEFAULT_PERMISSIONS;
+    metadata.permissions = data["2"] or {};
+    metadata.custom = data["0"] or {};
 
     return metadata;
 end
