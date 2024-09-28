@@ -1,5 +1,3 @@
-local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer");
-
 local ContentProvider = System.getContentProvider();
 local FileMetadata = ContentProvider.get("UwU.FileSystem.Metadata.FileMetadata");
 local DirectoryMetadata = ContentProvider.get("UwU.FileSystem.Metadata.DirectoryMetadata");

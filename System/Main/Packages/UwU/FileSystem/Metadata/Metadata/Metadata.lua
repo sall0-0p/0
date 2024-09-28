@@ -25,9 +25,9 @@ function Metadata.new(name, permissions, custom)
     metadata.custom = custom or {};
 
     ---@diagnostic disable-next-line: param-type-mismatch
-    metadata.created = os.time("utc");
+    metadata.created = os.time(os.date("!*t"));
     ---@diagnostic disable-next-line: param-type-mismatch
-    metadata.modified = os.time("utc");
+    metadata.modified = os.time(os.date("!*t"));
 
     return metadata;
 end
