@@ -116,6 +116,7 @@ function FsNode:delete()
 
     if self.path then
         fs.delete(self.path);
+        MetadataManager.clean(self.path);
     end
 end
 
@@ -137,6 +138,7 @@ function FsNode:rename(newName)
     self.parent:addChild(self.proxy);
 
     fs.move(oldPath, self.path);
+    MetadataManager.changeMeta(oldPath, self.path);
 
     if self.__children then
         self:__updateChildren()

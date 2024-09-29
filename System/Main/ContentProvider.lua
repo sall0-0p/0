@@ -27,7 +27,7 @@ function ContentProvider.register(package)
     else
         ContentProvider.__content:put(packagePath, {
             loaded = true;
-            module = require("." .. string.gsub(path, "/", ".") .. "." .. metadata.main);
+            instance = require("." .. string.gsub(path, "/", ".") .. "." .. metadata.main);
 
 
             Logger.info("Registered package `%s` in EAGER mode;", packagePath)

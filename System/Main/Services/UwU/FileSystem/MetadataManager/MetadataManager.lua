@@ -29,9 +29,9 @@ function MetadataManager.buildMeta(object)
     -- if metadata already defined for this path;
     if metadata[object.path] then
         if object.className == "Directory" or object.className == "RootDirectory" then
-            return DirectoryMetadata.fromTable(metadata[object.path]);
+            return DirectoryMetadata.fromTable(metadata[object.path], object.path);
         elseif object.className == "File" then
-            return FileMetadata.fromTable(metadata[object.path]);
+            return FileMetadata.fromTable(metadata[object.path], object.path);
         end
     -- if object is completely new, generate blank metadata;
     else 
@@ -53,21 +53,24 @@ function MetadataManager.buildMeta(object)
     end
 end
 
-function MetadataManager.changeMeta(oldPath, newPath, data)
+function MetadataManager.moveMeta(oldPath, newPath, data)
     metadata[oldPath] = nil;
     metadata[newPath] = data:toTable();
     flushData();
 end
 
-function MetadataManager.updateMeta(object, data)
-    metadata[object.path] = data:toTable();
+function MetadataManager.updateMeta(path, data)
+    metadata[path] = data:toTable();
     flushData();
 end
 
-function MetadataManager.clean(object)
-    metadata[object.path] = nil;
+function MetadataManager.clean(path)
+    metadata[path] = nil;
     flushData();
 end
+
+FileMetadata.init(MetadataManager);
+DirectoryMetadata.init(MetadataManager);
 
 return setmetatable(MetadataManager, {
     __call = init;
