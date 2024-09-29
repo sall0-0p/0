@@ -111,7 +111,6 @@ function ContentProvider.build(path)
     end)
 
     for _, package in pairs(list) do
-        print(package.packagePath);
         ContentProvider.register(package)
     end
 end
