@@ -3,9 +3,13 @@ local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer")
 local ContentProvider = System.getContentProvider();
 local Directory = ContentProvider.get("UwU.FileSystem.Directory");
 
+--FIXME: Change to ContentProvider!!!
+local MetadataManager = require(".System.Main.Services.UwU.FileSystem.MetadataManager.MetadataManager");
+
 ---@class RootDirectory
 ---@field className string
 ---@field class table
+---@field metadata table
 local RootDirectory = {};
 RootDirectory.__index = Directory;
 
@@ -19,6 +23,8 @@ function RootDirectory.new(name)
     if not fs.exists(directory.path) then
         directory:__addToDrive();
     end
+
+    directory.metadata = MetadataManager.buildMeta(directory);
 
     return directory:__generateProxy();
 end

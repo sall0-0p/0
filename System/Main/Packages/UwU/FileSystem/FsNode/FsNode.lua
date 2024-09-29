@@ -1,5 +1,8 @@
 local serializer = require(".System.Main.Packages.UwU.Utils.Modules.serializer");
 
+--FIXME: Change to ContentProvider!!!
+local MetadataManager = require(".System.Main.Services.UwU.FileSystem.MetadataManager.MetadataManager");
+
 ---@class FsNode
 ---@field displayName string
 ---@field simplifiedName string
@@ -75,6 +78,7 @@ function FsNode:move(newParent)
 
     if oldPath then
         fs.move(oldPath, self.path);
+        MetadataManager.changeMeta(oldPath, self.path);
     end
 
     if self.__children then
@@ -112,6 +116,7 @@ function FsNode:delete()
 
     if self.path then
         fs.delete(self.path);
+        MetadataManager.clean(self.path);
     end
 end
 
@@ -133,6 +138,7 @@ function FsNode:rename(newName)
     self.parent:addChild(self.proxy);
 
     fs.move(oldPath, self.path);
+    MetadataManager.changeMeta(oldPath, self.path);
 
     if self.__children then
         self:__updateChildren()

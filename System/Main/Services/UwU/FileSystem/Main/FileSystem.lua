@@ -1,4 +1,5 @@
 local ContentProvider = System:getContentProvider();
+local MetadataManager = ContentProvider.get("UwU.FileSystem.MetadataManager");
 local RootDirectory = ContentProvider.get("UwU.FileSystem.RootDirectory");
 local Directory = ContentProvider.get("UwU.FileSystem.Directory");
 local File = ContentProvider.get("UwU.FileSystem.File");
@@ -17,18 +18,22 @@ local function buildRecursively(parent)
     local items = fs.list(parent.path);
 
     for _, item in pairs(items) do
-        if fs.isDir(parent.path .. "/" .. item) then
-            -- print(item, "is directory")
-            local directory = Directory(item, parent);
-            buildRecursively(directory);
-        else 
-            -- print(item, "is file")
-            File(item, parent);
+        --FIXME: Remove:
+        if item ~= ".git" and item ~= ".vscode" then 
+            if fs.isDir(parent.path .. "/" .. item) then
+                -- print(item, "is directory")
+                local directory = Directory(item, parent);
+                buildRecursively(directory);
+            else 
+                -- print(item, "is file")
+                File(item, parent);
+            end
         end
     end
 end
 
 local function build()
+    MetadataManager();
     root = RootDirectory("");
 
     buildRecursively(root);

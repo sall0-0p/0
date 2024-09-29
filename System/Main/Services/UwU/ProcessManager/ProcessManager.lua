@@ -118,7 +118,6 @@ local function start()
                 end
 
                 if coroutine.status(thread.coroutine) == "dead" then
-                    -- Logger.warn("Thread %s from process %s is dead.", threadIndex, process.PID);
                     removeProcess(thread.exitCode or 0);
                 end
             end
