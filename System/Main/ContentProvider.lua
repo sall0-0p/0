@@ -54,20 +54,22 @@ local function buildListRecursive(path, packagePath, result)
                 if not types:containsValue(item) then
                     Logger.warn("Tried to register %s, which is not suitable!", item);
                 else 
-                    local _, metadata = xpcall(function() 
-                        return readConfig(path);
+                    local success, metadata = xpcall(function() 
+                        return readConfig(fs.combine(path, item));
                     end, 
 
                     function(err) -- error handler
-                        Logger.error("Cannot open config for %s", item);
+                        Logger.error("Error opening config %s", item);
                         Logger.error(err);
                     end)
     
-                    table.insert(result, {
-                        packagePath = packagePath; -- requesting path
-                        path = path; -- path to folder with contents
-                        metadata = readConfig(fs.combine(path, item)); -- metadata
-                    });
+                    if success and metadata then
+                        table.insert(result, {
+                            packagePath = packagePath; -- requesting path
+                            path = path; -- path to folder with contents
+                            metadata = metadata; -- metadata
+                        });
+                    end
                 end
             end
 
